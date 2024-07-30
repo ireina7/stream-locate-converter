@@ -194,6 +194,9 @@ mod test {
         let file = File::open("/Users/comcx/Workspace/Repo/stream-locate-converter/Cargo.toml")
             .expect("Failed to open file");
         let mut stream = Stream::from(file);
+        let ans = stream.line_index(Offset::new(50));
+        dbg!(ans);
+
         let ans = stream.line_index(Offset::new(20));
         dbg!(ans);
     }
