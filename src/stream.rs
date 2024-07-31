@@ -55,6 +55,12 @@ impl<R: io::Read> Stream<R> {
         self.set_base(0);
     }
 
+    /// Read length
+    #[inline]
+    pub fn read_len(&self) -> usize {
+        self.next_offset
+    }
+
     /// Get offset from line and column number
     pub fn offset_of(&mut self, line_index: LineIndex) -> io::Result<Offset> {
         let (line, col) = line_index.raw();
@@ -100,7 +106,7 @@ impl<R: io::Read> Stream<R> {
         }
     }
 
-    // Try to get more bytes and update states
+    /// Try to get more bytes and update states
     fn forward(&mut self) -> io::Result<usize> {
         let n = self.reader.read(&mut self.buffer)?;
 
@@ -113,6 +119,16 @@ impl<R: io::Read> Stream<R> {
         }
         self.next_offset += n;
         Ok(n)
+    }
+
+    /// Drain the reader, consume the reader
+    pub fn drain(&mut self) -> io::Result<()> {
+        loop {
+            let n = self.forward()?;
+            if n == 0 {
+                return Ok(());
+            }
+        }
     }
 }
 
@@ -199,5 +215,15 @@ mod test {
 
         let ans = stream.line_index(Offset::new(20));
         dbg!(ans);
+    }
+
+    #[test]
+    fn test_stream_drain() {
+        let file = File::open("/Users/comcx/Workspace/Repo/stream-locate-converter/Cargo.toml")
+            .expect("Failed to open file");
+        let mut stream = Stream::from(file);
+        let ans = stream.drain();
+        dbg!(ans);
+        dbg!(stream.lines);
     }
 }
