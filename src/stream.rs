@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::location::{LineIndex, Offset};
+use crate::location::{line_column, Offset};
 use std::io;
 
 /// A stream which can be used to convert between offsets and line-column numbers.
@@ -62,7 +62,7 @@ impl<R: io::Read> Stream<R> {
     }
 
     /// Get offset from line and column number
-    pub fn offset_of(&mut self, line_index: LineIndex) -> io::Result<Offset> {
+    pub fn offset_of(&mut self, line_index: line_column::ZeroBased) -> io::Result<Offset> {
         let (line, col) = line_index.raw();
         loop {
             if let Some(offset) = self.lines.get(line) {
@@ -76,7 +76,7 @@ impl<R: io::Read> Stream<R> {
     }
 
     /// Get line and column number from offset
-    pub fn line_index(&mut self, offset: Offset) -> io::Result<LineIndex> {
+    pub fn line_index(&mut self, offset: Offset) -> io::Result<line_column::ZeroBased> {
         let line = self.line_of(offset)?;
         let line_offset = self.lines.get(line).unwrap();
         let col = offset.raw() - line_offset;

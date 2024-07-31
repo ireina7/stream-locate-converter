@@ -16,7 +16,7 @@ fn main() -> io::Result<()> {
   let offset = location::Offset::new(20);
   let line_index = stream.line_index(offset)?;
 
-  let (line, col) = line_index.one_based();
+  let (line, col) = line_index.one_based().raw();
   println!("The offset is on line {line}, column {col}.");
 }
 ```
